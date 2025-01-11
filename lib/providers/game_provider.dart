@@ -34,6 +34,109 @@ class GameProvider extends ChangeNotifier {
     '🥬',
   ];
 
+  static const List<String> animals = [
+    '🐶',
+    '🐱',
+    '🐭',
+    '🐹',
+    '🐰',
+    '🦊',
+    '🐻',
+    '🐼',
+    '🐨',
+    '🐯',
+    '🦁',
+    '🐮',
+    '🐷',
+    '🐸',
+    '🐵',
+    '🦄',
+    '🐔',
+    '🦉',
+    '🦋',
+    '🐢',
+  ];
+
+  static const List<String> faces = [
+    '😀',
+    '😅',
+    '😂',
+    '🤣',
+    '😊',
+    '😇',
+    '🙂',
+    '😉',
+    '😍',
+    '🥰',
+    '😘',
+    '😋',
+    '🤪',
+    '😎',
+    '🤓',
+    '😤',
+    '🥳',
+    '😱',
+    '🤔',
+    '🤗',
+  ];
+
+  static const List<String> sports = [
+    '⚽',
+    '🏀',
+    '🏈',
+    '⚾',
+    '🎾',
+    '🏐',
+    '🏉',
+    '🎱',
+    '🏓',
+    '🏸',
+    '🏒',
+    '⛳',
+    '🎳',
+    '🏹',
+    '🥊',
+    '🏂',
+    '🏄',
+    '🚴',
+    '⛹️',
+    '🤸',
+  ];
+
+  static const List<String> nature = [
+    '🌸',
+    '🌹',
+    '🌺',
+    '🌻',
+    '🌼',
+    '🌷',
+    '🌱',
+    '🌲',
+    '🌳',
+    '🌴',
+    '🌵',
+    '🌿',
+    '🍀',
+    '🍁',
+    '🍂',
+    '🍃',
+    '🌊',
+    '🌈',
+    '⭐',
+    '🌙',
+  ];
+
+  static const Map<String, List<String>> cardSets = {
+    'Meyveler': fruits,
+    'Hayvanlar': animals,
+    'Yüz İfadeleri': faces,
+    'Spor': sports,
+    'Doğa': nature,
+  };
+
+  String _selectedCardSet = 'Meyveler';
+  String get selectedCardSet => _selectedCardSet;
+
   List<Player> _players = [];
   List<CardItem> _cards = [];
   int _currentPlayerIndex = 0;
@@ -73,12 +176,12 @@ class GameProvider extends ChangeNotifier {
         columns = 4;
     }
 
-    // Kartları oluştur
-    final List<String> selectedFruits = List.from(fruits);
-    selectedFruits.shuffle();
-    selectedFruits.length = cardCount ~/ 2;
+    // Seçili kart setinden kartları al
+    final List<String> selectedIcons = List.from(cardSets[_selectedCardSet]!);
+    selectedIcons.shuffle();
+    selectedIcons.length = cardCount ~/ 2;
 
-    _cards = [...selectedFruits, ...selectedFruits]
+    _cards = [...selectedIcons, ...selectedIcons]
         .asMap()
         .entries
         .map((entry) => CardItem(
@@ -180,6 +283,7 @@ class GameProvider extends ChangeNotifier {
   }
 
   void updatePlayerTime(int seconds) {
+    if (currentPlayer.timeLimit == -1) return; // Süresiz mod için kontrol
     currentPlayer.updateTime(seconds);
     notifyListeners();
   }
@@ -190,5 +294,10 @@ class GameProvider extends ChangeNotifier {
 
   bool _checkGameEnd() {
     return _matchedPairs == _cards.length ~/ 2;
+  }
+
+  void setCardSet(String cardSet) {
+    _selectedCardSet = cardSet;
+    notifyListeners();
   }
 }

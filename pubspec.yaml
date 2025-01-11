@@ -1,5 +1,5 @@
 name: aklimda
-description: "A new Flutter project."
+description: "Hafıza kartı eşleştirme oyunu"
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: "none" # Remove this line if you wish to publish to pub.dev
@@ -36,6 +36,8 @@ dependencies:
   cupertino_icons: ^1.0.8
   provider: ^6.1.2
   confetti: ^0.7.0
+  lottie: ^3.1.0
+  google_mobile_ads: ^4.0.0
 
 dev_dependencies:
   flutter_test:
@@ -89,16 +91,19 @@ flutter:
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
 
+  assets:
+    - lib/assets/
+
   fonts:
     - family: ComicNeue
       fonts:
-        - asset: assets/fonts/ComicNeue-Regular.ttf
-        - asset: assets/fonts/ComicNeue-Bold.ttf
+        - asset: lib/assets/fonts/ComicNeue-Regular.ttf
+        - asset: lib/assets/fonts/ComicNeue-Bold.ttf
           weight: 700
     - family: Quicksand
       fonts:
-        - asset: assets/fonts/Quicksand-Regular.ttf
-        - asset: assets/fonts/Quicksand-Medium.ttf
+        - asset: lib/assets/fonts/Quicksand-Regular.ttf
+        - asset: lib/assets/fonts/Quicksand-Medium.ttf
           weight: 500
-        - asset: assets/fonts/Quicksand-Bold.ttf
+        - asset: lib/assets/fonts/Quicksand-Bold.ttf
           weight: 700

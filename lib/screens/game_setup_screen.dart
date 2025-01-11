@@ -4,6 +4,7 @@ import 'dart:math';
 import '../providers/game_provider.dart';
 import '../models/player.dart';
 import 'game_screen.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class GameSetupScreen extends StatefulWidget {
   const GameSetupScreen({super.key});
@@ -18,17 +19,35 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
   int _timeLimit = 30;
   int _totalCards = 16;
   List<TextEditingController> _nameControllers = [];
+  InterstitialAd? _interstitialAd;
 
   @override
   void initState() {
     super.initState();
     _updateControllers();
+    _loadInterstitialAd();
   }
 
   void _updateControllers() {
     _nameControllers = List.generate(
       _playerCount,
       (index) => TextEditingController(),
+    );
+  }
+
+  void _loadInterstitialAd() {
+    InterstitialAd.load(
+      adUnitId: 'ca-app-pub-2913289160482051/1848945930',
+      request: const AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (ad) {
+          debugPrint('Reklam başarıyla yüklendi');
+          _interstitialAd = ad;
+        },
+        onAdFailedToLoad: (error) {
+          debugPrint('Reklam yüklenemedi: ${error.message}');
+        },
+      ),
     );
   }
 
@@ -46,30 +65,31 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
         return;
       }
 
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => GameScreen(
-            playerNames: playerNames,
-            cardCount: _totalCards,
+      void startGameScreen() {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => GameScreen(
+              playerNames: playerNames,
+              cardCount: _totalCards,
+            ),
           ),
-        ),
-      );
-    }
-  }
+        );
+      }
 
-  double _getIconSize() {
-    switch (_totalCards) {
-      case 16:
-        return 24.0;
-      case 25:
-        return 22.0;
-      case 36:
-        return 20.0;
-      case 49:
-        return 18.0;
-      default:
-        return 24.0;
+      if (_interstitialAd != null) {
+        debugPrint('Reklam gösteriliyor...');
+        _interstitialAd?.show().then((_) {
+          debugPrint('Reklam gösterildi, oyun başlatılıyor');
+          startGameScreen();
+        }).catchError((error) {
+          debugPrint('Reklam gösterilemedi: $error');
+          startGameScreen();
+        });
+      } else {
+        debugPrint('Reklam yüklü değil, direkt oyun başlatılıyor');
+        startGameScreen();
+      }
     }
   }
 
@@ -97,8 +117,8 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
                   'Oyun Ayarları',
                   style: TextStyle(
                     fontSize: 32,
+                    fontFamily: 'ComicNeue',
                     fontWeight: FontWeight.bold,
-                    fontFamily: 'Comic Sans MS',
                     color: Colors.white,
                   ),
                   textAlign: TextAlign.center,
@@ -142,7 +162,7 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
                                     '$_playerCount',
                                     style: TextStyle(
                                       fontSize: 20,
-                                      fontFamily: 'Comic Sans MS',
+                                      fontFamily: 'ComicNeue',
                                       fontWeight: FontWeight.bold,
                                       color: Theme.of(context).primaryColor,
                                     ),
@@ -169,28 +189,89 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               Text(
-                                '$_timeLimit saniye',
+                                _timeLimit == -1
+                                    ? 'Sınırsız'
+                                    : '$_timeLimit saniye',
                                 style: const TextStyle(
                                   fontSize: 16,
-                                  fontFamily: 'Comic Sans MS',
+                                  fontFamily: 'ComicNeue',
+                                  fontWeight: FontWeight.bold,
                                   color: Colors.black87,
                                 ),
                               ),
                               SizedBox(
                                 width: MediaQuery.of(context).size.width * 0.45,
                                 child: Slider(
-                                  value: _timeLimit.toDouble(),
-                                  min: 30,
-                                  max: 120,
+                                  value: _timeLimit == -1
+                                      ? 35
+                                      : _timeLimit.toDouble(),
+                                  min: 10,
+                                  max: 35,
                                   divisions: 6,
+                                  label: _timeLimit == -1 ? '∞' : '$_timeLimit',
                                   onChanged: (value) {
                                     setState(() {
-                                      _timeLimit = value.round();
+                                      _timeLimit =
+                                          value == 35 ? -1 : value.round();
                                     });
                                   },
                                 ),
                               ),
                             ],
+                          ),
+                        ),
+                        const Divider(height: 1),
+                        _buildSettingRow(
+                          'Kart Seti',
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Theme.of(context)
+                                  .primaryColor
+                                  .withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: DropdownButtonHideUnderline(
+                              child: DropdownButton<String>(
+                                value: context
+                                    .watch<GameProvider>()
+                                    .selectedCardSet,
+                                items: GameProvider.cardSets.keys
+                                    .map((set) => DropdownMenuItem(
+                                          value: set,
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 12),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Text(
+                                                  GameProvider
+                                                      .cardSets[set]!.first,
+                                                  style: const TextStyle(
+                                                      fontSize: 20),
+                                                ),
+                                                const SizedBox(width: 8),
+                                                Text(
+                                                  set,
+                                                  style: const TextStyle(
+                                                    fontFamily: 'ComicNeue',
+                                                    fontSize: 16,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ))
+                                    .toList(),
+                                onChanged: (value) {
+                                  if (value != null) {
+                                    context
+                                        .read<GameProvider>()
+                                        .setCardSet(value);
+                                  }
+                                },
+                              ),
+                            ),
                           ),
                         ),
                         const Divider(height: 1),
@@ -270,6 +351,7 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
                       decoration: InputDecoration(
                         labelText: '${index + 1}. Oyuncu',
                         labelStyle: const TextStyle(
+                          fontFamily: 'Quicksand',
                           color: Colors.black54,
                           fontWeight: FontWeight.w500,
                         ),
@@ -289,20 +371,22 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
                               color: Theme.of(context).primaryColor, width: 2),
                         ),
                         prefixIcon: Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: (_getIconSize() * 0.5)),
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
                           child: Icon(
                             Icons.person,
                             color: Theme.of(context).primaryColor,
-                            size: _getIconSize(),
+                            size: 24,
                           ),
                         ),
-                        contentPadding: EdgeInsets.symmetric(
-                          horizontal: _getIconSize() * 0.8,
-                          vertical: _getIconSize() * 0.7,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 16,
                         ),
                       ),
-                      style: TextStyle(fontSize: _getIconSize() * 0.7),
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontFamily: 'Quicksand',
+                      ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Lütfen bir isim girin';
@@ -367,7 +451,7 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
             label,
             style: const TextStyle(
               fontSize: 18,
-              fontFamily: 'Comic Sans MS',
+              fontFamily: 'ComicNeue',
               fontWeight: FontWeight.w600,
               color: Colors.black87,
             ),
@@ -383,6 +467,7 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
 
   @override
   void dispose() {
+    _interstitialAd?.dispose();
     for (var controller in _nameControllers) {
       controller.dispose();
     }
