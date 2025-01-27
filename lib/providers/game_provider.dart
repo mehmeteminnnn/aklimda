@@ -271,7 +271,16 @@ class GameProvider extends ChangeNotifier {
     return _cards.every((card) => card.isMatched);
   }
 
-  Player getWinner() {
+  bool isTieGame() {
+    if (_players.isEmpty) return false;
+    final firstScore = _players.first.score;
+    return _players.every((player) => player.score == firstScore);
+  }
+
+  Player? getWinner() {
+    if (isTieGame()) {
+      return null;  // Berabere durumunda null döndür
+    }
     return _players.reduce((a, b) => a.score > b.score ? a : b);
   }
 

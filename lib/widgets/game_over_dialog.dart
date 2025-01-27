@@ -4,7 +4,7 @@ import '../models/player.dart';
 import 'dart:math';
 
 class GameOverDialog extends StatefulWidget {
-  final Player winner;
+  final Player? winner;
   final List<Player> players;
 
   const GameOverDialog({
@@ -52,11 +52,13 @@ class _GameOverDialogState extends State<GameOverDialog> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Kazanan: ${widget.winner.name}',
-                style: const TextStyle(
+                widget.winner == null 
+                    ? 'Berabere! Şansınızı tekrar deneyin!'
+                    : 'Kazanan: ${widget.winner!.name}',
+                style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: Colors.green,
+                  color: widget.winner == null ? Colors.orange : Colors.green,
                 ),
               ),
               const SizedBox(height: 20),

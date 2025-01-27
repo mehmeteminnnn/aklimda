@@ -9,11 +9,13 @@ import '../widgets/score_board.dart';
 class GameScreen extends StatefulWidget {
   final List<String> playerNames;
   final int cardCount;
+  final int timeLimit;
 
   const GameScreen({
     super.key,
     required this.playerNames,
     required this.cardCount,
+    required this.timeLimit,
   });
 
   @override
@@ -29,9 +31,9 @@ class _GameScreenState extends State<GameScreen> {
       final gameProvider = context.read<GameProvider>();
       gameProvider
         ..initializePlayers(widget.playerNames
-            .map((name) => Player(name: name, timeLimit: 30))
+            .map((name) => Player(name: name, timeLimit: widget.timeLimit))
             .toList())
-        ..initializeGame(widget.cardCount, 30);
+        ..initializeGame(widget.cardCount, widget.timeLimit);
     });
   }
 
