@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'screens/splash_screen.dart';
 import 'screens/game_setup_screen.dart';
 import 'providers/game_provider.dart';
+import 'providers/language_provider.dart';
 import 'utils/theme.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
@@ -22,8 +23,11 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => GameProvider(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => GameProvider()),
+        ChangeNotifierProvider(create: (context) => LanguageProvider()),
+      ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Aklımda',

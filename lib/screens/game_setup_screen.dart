@@ -5,6 +5,7 @@ import '../providers/game_provider.dart';
 import '../models/player.dart';
 import 'game_screen.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import '../providers/language_provider.dart';
 
 class GameSetupScreen extends StatefulWidget {
   const GameSetupScreen({super.key});
@@ -94,7 +95,7 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
 
       if (playerNames.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('En az bir oyuncu gerekli')),
+          SnackBar(content: Text(context.watch<LanguageProvider>().getText('at_least_one_player_required'))),
         );
         return;
       }
@@ -153,9 +154,9 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text(
-                          'Oyun Ayarları',
-                          style: TextStyle(
+                        Text(
+                          context.watch<LanguageProvider>().getText('game_settings'),
+                          style: const TextStyle(
                             fontSize: 32,
                             fontFamily: 'ComicNeue',
                             fontWeight: FontWeight.bold,
@@ -173,9 +174,9 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
                             showDialog(
                               context: context,
                               builder: (context) => AlertDialog(
-                                title: const Text(
-                                  'Nasıl Oynanır?',
-                                  style: TextStyle(
+                                title: Text(
+                                  context.watch<LanguageProvider>().getText('how_to_play'),
+                                  style: const TextStyle(
                                     fontSize: 24,
                                     fontFamily: 'ComicNeue',
                                     fontWeight: FontWeight.bold,
@@ -186,60 +187,54 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     mainAxisSize: MainAxisSize.min,
-                                    children: const [
+                                    children: [
                                       Text(
-                                        'Amaç:',
-                                        style: TextStyle(
+                                        context.watch<LanguageProvider>().getText('objective'),
+                                        style: const TextStyle(
                                           fontSize: 18,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
-                                      SizedBox(height: 8),
+                                      const SizedBox(height: 8),
                                       Text(
-                                        'Oyunun amacı, aynı emojiden oluşan kart çiftlerini bulup eşleştirerek mümkün olduğunca fazla puan kazanmaktır.',
+                                        context.watch<LanguageProvider>().getText('objective_text'),
                                       ),
-                                      SizedBox(height: 16),
+                                      const SizedBox(height: 16),
                                       Text(
-                                        'Oyun Kuralları:',
-                                        style: TextStyle(
+                                        context.watch<LanguageProvider>().getText('game_rules'),
+                                        style: const TextStyle(
                                           fontSize: 18,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
-                                      SizedBox(height: 8),
+                                      const SizedBox(height: 8),
                                       Text(
-                                        '• Oyuncular sırayla kart seçer.\n'
-                                        '• Her oyuncu, bir hamlede iki kart açar. Eğer açılan kartlar eşleşirse:\n'
-                                        '  - 1 puan kazanılır.\n'
-                                        '  - Aynı oyuncu bir hamle daha yapabilir.\n'
-                                        '• Eşleşme olmazsa, sıra diğer oyuncuya geçer.\n'
-                                        '• Tüm kartlar eşleştirildiğinde oyun sona erer.',
+                                        context.watch<LanguageProvider>().getText('rules_text'),
                                       ),
-                                      SizedBox(height: 16),
+                                      const SizedBox(height: 16),
                                       Text(
-                                        'Puanlama ve Kazanan:',
-                                        style: TextStyle(
+                                        context.watch<LanguageProvider>().getText('scoring'),
+                                        style: const TextStyle(
                                           fontSize: 18,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
-                                      SizedBox(height: 8),
+                                      const SizedBox(height: 8),
                                       Text(
-                                        '• En fazla puanı toplayan oyuncu oyunu kazanır.\n'
-                                        '• Eşitlik durumunda, beraberlik ilan edilir.',
+                                        context.watch<LanguageProvider>().getText('scoring_text'),
                                       ),
-                                      SizedBox(height: 16),
+                                      const SizedBox(height: 16),
                                       Text(
-                                        'Not:',
-                                        style: TextStyle(
+                                        context.watch<LanguageProvider>().getText('note'),
+                                        style: const TextStyle(
                                           fontSize: 18,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
-                                      SizedBox(height: 8),
+                                      const SizedBox(height: 8),
                                       Text(
-                                        'Kartları dikkatlice ezberleyerek doğru eşleşmeleri yapmaya çalışın ve rakiplerinizden daha fazla puan kazanın!',
-                                        style: TextStyle(
+                                        context.watch<LanguageProvider>().getText('note_text'),
+                                        style: const TextStyle(
                                           fontStyle: FontStyle.italic,
                                         ),
                                       ),
@@ -249,9 +244,46 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
                                 actions: [
                                   TextButton(
                                     onPressed: () => Navigator.of(context).pop(),
-                                    child: const Text('Anladım'),
+                                    child: Text(context.watch<LanguageProvider>().getText('understood')),
                                   ),
                                 ],
+                              ),
+                            );
+                          },
+                        ),
+                        IconButton(
+                          icon: Text(
+                            context.watch<LanguageProvider>().currentLanguage == 'tr' ? '🇹🇷' : '🇬🇧',
+                            style: const TextStyle(fontSize: 24),
+                          ),
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: Text(context.watch<LanguageProvider>().getText('select_language')),
+                                content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    ListTile(
+                                      leading: const Text('🇹🇷', style: TextStyle(fontSize: 24)),
+                                      title: const Text('Türkçe'),
+                                      onTap: () {
+                                        context.read<LanguageProvider>().setLanguage('tr');
+                                        Navigator.pop(context);
+                                      },
+                                      selected: context.watch<LanguageProvider>().currentLanguage == 'tr',
+                                    ),
+                                    ListTile(
+                                      leading: const Text('🇬🇧', style: TextStyle(fontSize: 24)),
+                                      title: const Text('English'),
+                                      onTap: () {
+                                        context.read<LanguageProvider>().setLanguage('en');
+                                        Navigator.pop(context);
+                                      },
+                                      selected: context.watch<LanguageProvider>().currentLanguage == 'en',
+                                    ),
+                                  ],
+                                ),
                               ),
                             );
                           },
@@ -269,7 +301,7 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
                         child: Column(
                           children: [
                             _buildSettingRow(
-                              'Oyuncu Sayısı',
+                              context.watch<LanguageProvider>().getText('player_count'),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
@@ -319,7 +351,7 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
                             ),
                             const Divider(height: 1),
                             _buildSettingRow(
-                              'Süre',
+                              context.watch<LanguageProvider>().getText('time_limit'),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
@@ -352,7 +384,7 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
                             ),
                             const Divider(height: 1),
                             _buildSettingRow(
-                              'Kart Seti',
+                              context.watch<LanguageProvider>().getText('card_set'),
                               Container(
                                 decoration: BoxDecoration(
                                   color: Theme.of(context)
@@ -406,7 +438,7 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
                             ),
                             const Divider(height: 1),
                             _buildSettingRow(
-                              'Toplam Kart',
+                              context.watch<LanguageProvider>().getText('total_cards'),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [16, 24, 36].map((count) {
@@ -479,7 +511,7 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
                         child: TextFormField(
                           controller: _nameControllers[index],
                           decoration: InputDecoration(
-                            labelText: '${index + 1}. Oyuncu',
+                            labelText: '${index + 1}. ${context.watch<LanguageProvider>().getText('player')}',
                             labelStyle: const TextStyle(
                               fontFamily: 'Quicksand',
                               color: Colors.black54,
@@ -519,7 +551,7 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Lütfen bir isim girin';
+                              return context.watch<LanguageProvider>().getText('please_enter_a_name');
                             }
                             return null;
                           },
@@ -545,7 +577,7 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            'Oyunu Başlat',
+                            context.watch<LanguageProvider>().getText('start_game'),
                             style: TextStyle(
                               fontSize: 20,
                               fontFamily: 'ComicNeue',

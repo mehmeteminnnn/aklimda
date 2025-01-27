@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/game_provider.dart';
+import '../providers/language_provider.dart';
 import '../models/player.dart';
 import '../widgets/game_grid.dart';
 import '../widgets/timer_widget.dart';
@@ -41,7 +42,14 @@ class _GameScreenState extends State<GameScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Hafıza Oyunu'),
+        title: Text(
+          context.watch<LanguageProvider>().getText('memory_game'),
+          style: const TextStyle(
+            fontSize: 32,
+            fontFamily: 'ComicNeue',
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         centerTitle: true,
         elevation: 0,
         backgroundColor: Theme.of(context).colorScheme.primary,
@@ -170,7 +178,7 @@ class ScoreBoard extends StatelessWidget {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        '${player.name}: ${player.score}',
+                        '${player.name}: ${player.score} ${context.watch<LanguageProvider>().getText('points')}',
                         style: TextStyle(
                           fontWeight: player == currentPlayer
                               ? FontWeight.bold
