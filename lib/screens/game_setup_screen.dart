@@ -36,16 +36,50 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
   }
 
   void _loadInterstitialAd() {
+    debugPrint('Reklam yükleme başlatıldı...');
+
     InterstitialAd.load(
       adUnitId: 'ca-app-pub-2913289160482051/1848945930',
-      request: const AdRequest(),
+      request: const AdRequest(
+        keywords: ['game', 'memory game'],
+        nonPersonalizedAds: true,
+      ),
       adLoadCallback: InterstitialAdLoadCallback(
         onAdLoaded: (ad) {
           debugPrint('Reklam başarıyla yüklendi');
           _interstitialAd = ad;
+
+          ad.fullScreenContentCallback = FullScreenContentCallback(
+            onAdShowedFullScreenContent: (ad) {
+              debugPrint('Reklam tam ekran gösterildi');
+            },
+            onAdDismissedFullScreenContent: (ad) {
+              debugPrint('Reklam kapatıldı');
+              ad.dispose();
+              _loadInterstitialAd();
+            },
+            onAdFailedToShowFullScreenContent: (ad, error) {
+              debugPrint('Reklam gösterme hatası: ${error.message}');
+              debugPrint('Hata kodu: ${error.code}');
+              debugPrint('Domain: ${error.domain}');
+              ad.dispose();
+              _loadInterstitialAd();
+            },
+            onAdImpression: (_) {
+              debugPrint('Reklam gösterim kaydedildi');
+            },
+          );
         },
-        onAdFailedToLoad: (error) {
-          debugPrint('Reklam yüklenemedi: ${error.message}');
+        onAdFailedToLoad: (LoadAdError error) {
+          debugPrint('Reklam yüklenemedi');
+          debugPrint('Hata mesajı: ${error.message}');
+          debugPrint('Hata kodu: ${error.code}');
+          debugPrint('Domain: ${error.domain}');
+          debugPrint('Response info: ${error.responseInfo}');
+
+          Future.delayed(const Duration(seconds: 5), () {
+            _loadInterstitialAd();
+          });
         },
       ),
     );

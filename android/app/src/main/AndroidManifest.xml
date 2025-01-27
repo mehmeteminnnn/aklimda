@@ -1,8 +1,18 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Reklam izinleri -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID"/>
+    
     <application
-        android:label="aklimda"
+        android:label="Aklımda"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+        
+        <!-- Reklam ID'si -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-2913289160482051~6749918822"/>  <!-- Uygulama ID'nizi buraya ekleyin -->
+            
         <activity
             android:name=".MainActivity"
             android:exported="true"

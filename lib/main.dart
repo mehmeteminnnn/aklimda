@@ -10,7 +10,10 @@ final navigatorKey = GlobalKey<NavigatorState>();
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  MobileAds.instance.initialize();
+  MobileAds.instance.initialize().then((initializationStatus) {
+    debugPrint(
+        'MobileAds initialization status: ${initializationStatus.adapterStatuses}');
+  });
   runApp(const MyApp());
 }
 
