@@ -1,4 +1,4 @@
-package com.example.aklimda
+package com.meminapp.aklimda
 
 import io.flutter.embedding.android.FlutterActivity
 

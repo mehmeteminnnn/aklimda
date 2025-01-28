@@ -14,7 +14,7 @@
             android:value="ca-app-pub-2913289160482051~6749918822"/>  <!-- Uygulama ID'nizi buraya ekleyin -->
             
         <activity
-            android:name=".MainActivity"
+            android:name="com.meminapp.aklimda.MainActivity"
             android:exported="true"
             android:launchMode="singleTop"
             android:taskAffinity=""
