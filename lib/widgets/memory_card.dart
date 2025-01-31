@@ -12,7 +12,7 @@ class MemoryCard extends StatelessWidget {
   double _getEmojiSize(BuildContext context) {
     final cardCount = context.read<GameProvider>().cards.length;
     if (cardCount <= 16) return 48;
-    if (cardCount <= 24) return 32;
+    if (cardCount <= 24) return 29;
     if (cardCount <= 36) return 28;
     return 24;
   }

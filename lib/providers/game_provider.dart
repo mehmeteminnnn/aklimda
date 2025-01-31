@@ -279,14 +279,15 @@ class GameProvider extends ChangeNotifier {
 
   Player? getWinner() {
     if (isTieGame()) {
-      return null;  // Berabere durumunda null döndür
+      return null; // Berabere durumunda null döndür
     }
     return _players.reduce((a, b) => a.score > b.score ? a : b);
   }
 
   void initializePlayers(List<Player> players) {
-    if (players.isEmpty) return; // Boş liste kontrolü
-    _players = players;
+    if (players.isEmpty) return;
+    _players =
+        players.take(players.length).toList(); // Sadece seçilen sayıda oyuncu
     _currentPlayerIndex = 0;
     notifyListeners();
   }

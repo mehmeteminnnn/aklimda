@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:confetti/confetti.dart';
 import '../models/player.dart';
 import 'dart:math';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class GameOverDialog extends StatefulWidget {
   final Player? winner;
@@ -19,16 +20,34 @@ class GameOverDialog extends StatefulWidget {
 
 class _GameOverDialogState extends State<GameOverDialog> {
   late ConfettiController _confettiController;
+  InterstitialAd? _interstitialAd;
 
   @override
   void initState() {
     super.initState();
     _confettiController =
         ConfettiController(duration: const Duration(seconds: 5))..play();
+    _loadInterstitialAd();
+  }
+
+  void _loadInterstitialAd() {
+    InterstitialAd.load(
+      adUnitId: 'ca-app-pub-2913289160482051/1848945930',
+      request: const AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (ad) {
+          _interstitialAd = ad;
+        },
+        onAdFailedToLoad: (error) {
+          debugPrint('Reklam yüklenemedi: $error');
+        },
+      ),
+    );
   }
 
   @override
   void dispose() {
+    _interstitialAd?.dispose();
     _confettiController.dispose();
     super.dispose();
   }
@@ -52,7 +71,7 @@ class _GameOverDialogState extends State<GameOverDialog> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                widget.winner == null 
+                widget.winner == null
                     ? 'Berabere! Şansınızı tekrar deneyin!'
                     : 'Kazanan: ${widget.winner!.name}',
                 style: TextStyle(
@@ -96,7 +115,13 @@ class _GameOverDialogState extends State<GameOverDialog> {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).pushReplacementNamed('/setup');
+                if (_interstitialAd != null) {
+                  _interstitialAd?.show().then((_) {
+                    Navigator.of(context).pushReplacementNamed('/setup');
+                  });
+                } else {
+                  Navigator.of(context).pushReplacementNamed('/setup');
+                }
               },
               child: const Text('Yeni Oyun'),
             ),

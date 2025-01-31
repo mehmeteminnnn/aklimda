@@ -6,20 +6,28 @@ import 'providers/game_provider.dart';
 import 'providers/language_provider.dart';
 import 'utils/theme.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'screens/tutorial_screen.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  final prefs = await SharedPreferences.getInstance();
+  final isFirstTime = prefs.getBool('isFirstTime') ?? true;
+
   MobileAds.instance.initialize().then((initializationStatus) {
     debugPrint(
         'MobileAds initialization status: ${initializationStatus.adapterStatuses}');
   });
-  runApp(const MyApp());
+
+  runApp(MyApp(isFirstTime: isFirstTime));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final bool isFirstTime;
+
+  const MyApp({super.key, required this.isFirstTime});
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +41,7 @@ class MyApp extends StatelessWidget {
         title: 'Aklımda',
         theme: AppTheme.lightTheme,
         navigatorKey: navigatorKey,
-        home: const SplashScreen(),
+        home: isFirstTime ? const TutorialScreen() : const SplashScreen(),
         routes: {
           '/setup': (context) => const GameSetupScreen(),
         },
