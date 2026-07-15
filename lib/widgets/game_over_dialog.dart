@@ -3,6 +3,7 @@ import 'package:confetti/confetti.dart';
 import '../models/player.dart';
 import 'dart:math';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import '../utils/ad_helper.dart';
 
 class GameOverDialog extends StatefulWidget {
   final Player? winner;
@@ -32,17 +33,32 @@ class _GameOverDialogState extends State<GameOverDialog> {
 
   void _loadInterstitialAd() {
     InterstitialAd.load(
-      adUnitId: 'ca-app-pub-2913289160482051/1848945930',
+      adUnitId: AdHelper.interstitialAdUnitId,
       request: const AdRequest(),
       adLoadCallback: InterstitialAdLoadCallback(
         onAdLoaded: (ad) {
+          debugPrint('Geçiş reklamı yüklendi');
           _interstitialAd = ad;
         },
         onAdFailedToLoad: (error) {
-          debugPrint('Reklam yüklenemedi: $error');
+          debugPrint('Geçiş reklamı yüklenemedi: $error');
         },
       ),
     );
+  }
+
+  void _startNewGame() {
+    if (_interstitialAd != null) {
+      _interstitialAd?.show().then((_) {
+        Navigator.of(context).pushReplacementNamed('/setup');
+      }).catchError((error) {
+        debugPrint('Reklam gösterme hatası: $error');
+        Navigator.of(context).pushReplacementNamed('/setup');
+      });
+    } else {
+      debugPrint('Reklam yüklü değil, direkt yönlendiriliyor');
+      Navigator.of(context).pushReplacementNamed('/setup');
+    }
   }
 
   @override
@@ -114,15 +130,7 @@ class _GameOverDialogState extends State<GameOverDialog> {
           ),
           actions: [
             TextButton(
-              onPressed: () {
-                if (_interstitialAd != null) {
-                  _interstitialAd?.show().then((_) {
-                    Navigator.of(context).pushReplacementNamed('/setup');
-                  });
-                } else {
-                  Navigator.of(context).pushReplacementNamed('/setup');
-                }
-              },
+              onPressed: _startNewGame,
               child: const Text('Yeni Oyun'),
             ),
           ],

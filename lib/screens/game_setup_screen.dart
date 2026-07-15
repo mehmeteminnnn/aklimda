@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'dart:io';
 import 'dart:math';
 import '../providers/game_provider.dart';
 import '../models/player.dart';
 import 'game_screen.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../providers/language_provider.dart';
+import '../utils/ad_helper.dart';
 
 class GameSetupScreen extends StatefulWidget {
   const GameSetupScreen({super.key});
@@ -40,7 +42,7 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
     debugPrint('Reklam yükleme başlatıldı...');
 
     InterstitialAd.load(
-      adUnitId: 'ca-app-pub-2913289160482051/1848945930',
+      adUnitId: AdHelper.interstitialAdUnitId,
       request: const AdRequest(
         keywords: ['game', 'memory game'],
         nonPersonalizedAds: true,
