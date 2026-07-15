@@ -1,0 +1,3 @@
+// Disable Swift Package Manager to resolve dependency conflicts
+ENABLE_USER_SCRIPT_SANDBOXING = NO
+
