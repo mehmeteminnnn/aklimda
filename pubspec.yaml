@@ -38,10 +38,7 @@ dependencies:
   confetti: ^0.7.0
   google_mobile_ads: ^4.0.0
   shared_preferences: ^2.5.1
-  webview_flutter: ^4.4.2
-
-dependency_overrides:
-  webview_flutter_wkwebview: ^2.8.4
+  webview_flutter_wkwebview: ^2.5.0
 
 dev_dependencies:
   flutter_test:
