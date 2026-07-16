@@ -1,0 +1,6 @@
+{
+  "disable-swift-package-manager": true,
+  "ios": {
+    "disable-swift-package-manager": true
+  }
+}

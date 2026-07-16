@@ -3,6 +3,7 @@ import 'package:confetti/confetti.dart';
 import '../models/player.dart';
 import 'dart:math';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import '../utils/ad_helper.dart';
 
 class GameOverDialog extends StatefulWidget {
   final Player? winner;
@@ -32,7 +33,7 @@ class _GameOverDialogState extends State<GameOverDialog> {
 
   void _loadInterstitialAd() {
     InterstitialAd.load(
-      adUnitId: 'ca-app-pub-2913289160482051/1848945930',
+      adUnitId: AdHelper.interstitialAdUnitId,
       request: const AdRequest(),
       adLoadCallback: InterstitialAdLoadCallback(
         onAdLoaded: (ad) {

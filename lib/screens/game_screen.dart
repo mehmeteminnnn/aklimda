@@ -7,6 +7,7 @@ import '../widgets/game_grid.dart';
 import '../widgets/timer_widget.dart';
 import '../widgets/score_board.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import '../utils/ad_helper.dart';
 
 class GameScreen extends StatefulWidget {
   final List<String> playerNames;
@@ -44,7 +45,7 @@ class _GameScreenState extends State<GameScreen> {
 
   void _loadBannerAd() {
     _bannerAd = BannerAd(
-      adUnitId: 'ca-app-pub-2913289160482051/6240175560',
+      adUnitId: AdHelper.bannerAdUnitId,
       size: AdSize.banner,
       request: const AdRequest(),
       listener: BannerAdListener(
