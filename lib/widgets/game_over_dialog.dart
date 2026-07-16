@@ -36,13 +36,28 @@ class _GameOverDialogState extends State<GameOverDialog> {
       request: const AdRequest(),
       adLoadCallback: InterstitialAdLoadCallback(
         onAdLoaded: (ad) {
+          debugPrint('Geçiş reklamı yüklendi');
           _interstitialAd = ad;
         },
         onAdFailedToLoad: (error) {
-          debugPrint('Reklam yüklenemedi: $error');
+          debugPrint('Geçiş reklamı yüklenemedi: $error');
         },
       ),
     );
+  }
+
+  void _startNewGame() {
+    if (_interstitialAd != null) {
+      _interstitialAd?.show().then((_) {
+        Navigator.of(context).pushReplacementNamed('/setup');
+      }).catchError((error) {
+        debugPrint('Reklam gösterme hatası: $error');
+        Navigator.of(context).pushReplacementNamed('/setup');
+      });
+    } else {
+      debugPrint('Reklam yüklü değil, direkt yönlendiriliyor');
+      Navigator.of(context).pushReplacementNamed('/setup');
+    }
   }
 
   @override
@@ -114,15 +129,7 @@ class _GameOverDialogState extends State<GameOverDialog> {
           ),
           actions: [
             TextButton(
-              onPressed: () {
-                if (_interstitialAd != null) {
-                  _interstitialAd?.show().then((_) {
-                    Navigator.of(context).pushReplacementNamed('/setup');
-                  });
-                } else {
-                  Navigator.of(context).pushReplacementNamed('/setup');
-                }
-              },
+              onPressed: _startNewGame,
               child: const Text('Yeni Oyun'),
             ),
           ],

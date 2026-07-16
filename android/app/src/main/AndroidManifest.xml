@@ -6,7 +6,7 @@
     <application
         android:label="Aklımda"
         android:name="${applicationName}"
-        android:icon="@mipmap/aklimdaikon">
+        android:icon="@mipmap/ic_launcher">
         
         <!-- Reklam ID'si -->
         <meta-data
