@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:provider/provider.dart';
 import '../providers/game_provider.dart';
+import '../utils/theme.dart';
 
 class TimerWidget extends StatefulWidget {
   const TimerWidget({super.key});
@@ -46,13 +47,15 @@ class _TimerWidgetState extends State<TimerWidget> {
       tween: Tween(begin: 0, end: remainingTime.toDouble()),
       duration: const Duration(milliseconds: 300),
       builder: (context, value, child) {
-        return Text(
-          '${value.toInt()} saniye',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: isLowTime ? Colors.red : Colors.black,
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          decoration: BoxDecoration(
+            color: isLowTime ? const Color(0xFFFFE5E5) : Colors.white.withValues(alpha: .88),
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(color: isLowTime ? AppColors.timerWarning : AppColors.meadow),
           ),
+          child: Text('${value.toInt()} sn', style: Theme.of(context).textTheme.titleMedium?.copyWith(color: isLowTime ? AppColors.timerWarning : AppColors.forest)),
         );
       },
     );

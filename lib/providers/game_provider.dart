@@ -1,139 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'dart:math';
 import '../models/player.dart';
 import '../models/card_item.dart';
 import '../widgets/game_over_dialog.dart';
+import '../utils/card_assets.dart';
 import '../main.dart';
 
+enum GameEvent { match, mismatch, gameOver }
+
 class GameProvider extends ChangeNotifier {
-  static const List<String> fruits = [
-    '🍎',
-    '🍌',
-    '🍇',
-    '🍊',
-    '🍓',
-    '🍐',
-    '🍉',
-    '🥝',
-    '🥭',
-    '🍍',
-    '🍒',
-    '🥥',
-    '🫐',
-    '🍑',
-    '🍋',
-    '🍈',
-    '🍏',
-    '🍅',
-    '🥑',
-    '🥦',
-    '🍆',
-    '🥕',
-    '🌽',
-    '🥬',
-  ];
-
-  static const List<String> animals = [
-    '🐶',
-    '🐱',
-    '🐭',
-    '🐹',
-    '🐰',
-    '🦊',
-    '🐻',
-    '🐼',
-    '🐨',
-    '🐯',
-    '🦁',
-    '🐮',
-    '🐷',
-    '🐸',
-    '🐵',
-    '🦄',
-    '🐔',
-    '🦉',
-    '🦋',
-    '🐢',
-  ];
-
-  static const List<String> faces = [
-    '😀',
-    '😅',
-    '😂',
-    '🤣',
-    '😊',
-    '😇',
-    '🙂',
-    '😉',
-    '😍',
-    '🥰',
-    '😘',
-    '😋',
-    '🤪',
-    '😎',
-    '🤓',
-    '😤',
-    '🥳',
-    '😱',
-    '🤔',
-    '🤗',
-  ];
-
-  static const List<String> sports = [
-    '⚽',
-    '🏀',
-    '🏈',
-    '⚾',
-    '🎾',
-    '🏐',
-    '🏉',
-    '🎱',
-    '🏓',
-    '🏸',
-    '🏒',
-    '⛳',
-    '🎳',
-    '🏹',
-    '🥊',
-    '🏂',
-    '🏄',
-    '🚴',
-    '⛹️',
-    '🤸',
-  ];
-
-  static const List<String> nature = [
-    '🌸',
-    '🌹',
-    '🌺',
-    '🌻',
-    '🌼',
-    '🌷',
-    '🌱',
-    '🌲',
-    '🌳',
-    '🌴',
-    '🌵',
-    '🌿',
-    '🍀',
-    '🍁',
-    '🍂',
-    '🍃',
-    '🌊',
-    '🌈',
-    '⭐',
-    '🌙',
-  ];
-
-  static const Map<String, List<String>> cardSets = {
-    'Meyveler': fruits,
-    'Hayvanlar': animals,
-    'Yüz İfadeleri': faces,
-    'Spor': sports,
-    'Doğa': nature,
-  };
-
   String _selectedCardSet = 'Meyveler';
   String get selectedCardSet => _selectedCardSet;
 
@@ -143,59 +19,59 @@ class GameProvider extends ChangeNotifier {
   CardItem? _firstSelectedCard;
   bool _canFlipCard = true;
   Function(Player)? _onPlayerChanged;
-  List<CardItem> _flippedCards = [];
   int _matchedPairs = 0;
   int gridColumns = 4;
   int gridRows = 4;
+
+  // Olay dinleyicileri
+  VoidCallback? onMatch;
+  VoidCallback? onMismatch;
 
   List<Player> get players => _players;
   List<CardItem> get cards => _cards;
   Player get currentPlayer => _players.isNotEmpty
       ? _players[_currentPlayerIndex]
-      : Player(name: 'Oyuncu', timeLimit: 30); // Varsayılan oyuncu
+      : Player(name: 'Oyuncu', timeLimit: 30);
   bool get canFlipCard => _canFlipCard;
 
+  static Map<String, List<String>> get cardSets => CardAssets.cardSets;
+
   void initializeGame(int cardCount, int timeLimit) {
-    // Grid boyutlarını ayarla
     int rows, columns;
     switch (cardCount) {
       case 16:
         rows = 4;
         columns = 4;
-        break;
       case 24:
         rows = 4;
         columns = 6;
-        break;
       case 36:
         rows = 6;
         columns = 6;
-        break;
       default:
         rows = 4;
         columns = 4;
     }
 
-    // Seçili kart setinden kartları al
-    final List<String> selectedIcons = List.from(cardSets[_selectedCardSet]!);
-    selectedIcons.shuffle();
-    selectedIcons.length = cardCount ~/ 2;
+    final category = CardAssets.categoryForSet(_selectedCardSet);
+    final List<String> selectedSymbols =
+        List.from(cardSets[_selectedCardSet]!);
+    selectedSymbols.shuffle();
+    selectedSymbols.length = cardCount ~/ 2;
 
-    _cards = [...selectedIcons, ...selectedIcons]
+    _cards = [...selectedSymbols, ...selectedSymbols]
         .asMap()
         .entries
         .map((entry) => CardItem(
               id: entry.key,
-              fruit: entry.value,
+              symbolId: entry.value,
+              category: category,
             ))
         .toList();
     _cards.shuffle();
 
-    // Grid'i ayarla
     gridColumns = columns;
     gridRows = rows;
-
-    _flippedCards.clear();
     _matchedPairs = 0;
 
     notifyListeners();
@@ -205,9 +81,11 @@ class GameProvider extends ChangeNotifier {
     if (!_canFlipCard) return;
 
     final index = _cards.indexOf(card);
-    if (index == -1 || _cards[index].isMatched || _cards[index].isFlipped)
+    if (index == -1 || _cards[index].isMatched || _cards[index].isFlipped) {
       return;
+    }
 
+    HapticFeedback.selectionClick();
     _cards[index].isFlipped = true;
     notifyListeners();
 
@@ -220,21 +98,39 @@ class GameProvider extends ChangeNotifier {
   }
 
   void _checkMatch(CardItem secondCard) {
-    Future.delayed(const Duration(milliseconds: 1000), () {
-      if (_firstSelectedCard!.fruit == secondCard.fruit) {
+    Future.delayed(const Duration(milliseconds: 800), () {
+      if (_firstSelectedCard!.symbolId == secondCard.symbolId) {
         _firstSelectedCard!.isMatched = true;
         secondCard.isMatched = true;
         currentPlayer.updateScore(1);
         currentPlayer.resetTime();
         _matchedPairs++;
 
+        HapticFeedback.mediumImpact();
+        onMatch?.call();
+
         if (_checkGameEnd()) {
           _showGameOverDialog();
         }
       } else {
-        _firstSelectedCard!.isFlipped = false;
-        secondCard.isFlipped = false;
-        nextPlayer();
+        _firstSelectedCard!.isShaking = true;
+        secondCard.isShaking = true;
+        notifyListeners();
+
+        HapticFeedback.heavyImpact();
+        onMismatch?.call();
+
+        Future.delayed(const Duration(milliseconds: 500), () {
+          _firstSelectedCard!.isFlipped = false;
+          secondCard.isFlipped = false;
+          _firstSelectedCard!.isShaking = false;
+          secondCard.isShaking = false;
+          nextPlayer();
+          _firstSelectedCard = null;
+          _canFlipCard = true;
+          notifyListeners();
+        });
+        return;
       }
 
       _firstSelectedCard = null;
@@ -258,18 +154,13 @@ class GameProvider extends ChangeNotifier {
 
   void nextPlayer() {
     _currentPlayerIndex = (_currentPlayerIndex + 1) % _players.length;
-    // Yeni oyuncunun süresini sıfırla
     currentPlayer.resetTime();
     notifyListeners();
 
-    if (_onPlayerChanged != null) {
-      _onPlayerChanged!(_players[_currentPlayerIndex]);
-    }
+    _onPlayerChanged?.call(_players[_currentPlayerIndex]);
   }
 
-  bool isGameOver() {
-    return _cards.every((card) => card.isMatched);
-  }
+  bool isGameOver() => _cards.every((card) => card.isMatched);
 
   bool isTieGame() {
     if (_players.isEmpty) return false;
@@ -278,22 +169,19 @@ class GameProvider extends ChangeNotifier {
   }
 
   Player? getWinner() {
-    if (isTieGame()) {
-      return null; // Berabere durumunda null döndür
-    }
+    if (isTieGame()) return null;
     return _players.reduce((a, b) => a.score > b.score ? a : b);
   }
 
   void initializePlayers(List<Player> players) {
     if (players.isEmpty) return;
-    _players =
-        players.take(players.length).toList(); // Sadece seçilen sayıda oyuncu
+    _players = players.take(players.length).toList();
     _currentPlayerIndex = 0;
     notifyListeners();
   }
 
   void updatePlayerTime(int seconds) {
-    if (currentPlayer.timeLimit == -1) return; // Süresiz mod için kontrol
+    if (currentPlayer.timeLimit == -1) return;
     currentPlayer.updateTime(seconds);
     notifyListeners();
   }
@@ -302,9 +190,7 @@ class GameProvider extends ChangeNotifier {
     _onPlayerChanged = callback;
   }
 
-  bool _checkGameEnd() {
-    return _matchedPairs == _cards.length ~/ 2;
-  }
+  bool _checkGameEnd() => _matchedPairs == _cards.length ~/ 2;
 
   void setCardSet(String cardSet) {
     _selectedCardSet = cardSet;

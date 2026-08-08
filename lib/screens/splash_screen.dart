@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'game_setup_screen.dart';
+import '../widgets/garden_background.dart';
+import '../utils/page_transitions.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -39,17 +41,7 @@ class _SplashScreenState extends State<SplashScreen>
 
     _controller.forward().then((_) {
       Future.delayed(const Duration(milliseconds: 500), () {
-        Navigator.of(context).pushReplacement(
-          PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) =>
-                const GameSetupScreen(),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              return FadeTransition(opacity: animation, child: child);
-            },
-            transitionDuration: const Duration(milliseconds: 800),
-          ),
-        );
+        if (mounted) Navigator.of(context).pushReplacement(AppPageTransitions.fade(const GameSetupScreen(), duration: const Duration(milliseconds: 550)));
       });
     });
   }
@@ -63,18 +55,7 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Theme.of(context).primaryColor,
-              Theme.of(context).primaryColor.withOpacity(0.7),
-            ],
-          ),
-        ),
-        child: Center(
+      body: SafeArea(child: GardenBackground(child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -102,7 +83,7 @@ class _SplashScreenState extends State<SplashScreen>
                                   'AKLIMDA',
                                   style: TextStyle(
                                     fontSize: 32,
-                                    fontFamily: 'ComicNeue',
+                                    fontFamily: 'Nunito',
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
                                     shadows: [
@@ -119,7 +100,7 @@ class _SplashScreenState extends State<SplashScreen>
                                   'Hafızana Ne Kadar Güveniyorsun?',
                                   style: TextStyle(
                                     fontSize: 18,
-                                    fontFamily: 'ComicNeue',
+                                    fontFamily: 'Nunito',
                                     color: Colors.white.withOpacity(0.9),
                                   ),
                                 ),
@@ -134,8 +115,7 @@ class _SplashScreenState extends State<SplashScreen>
               ),
             ],
           ),
-        ),
-      ),
+        ))),
     );
   }
 }
