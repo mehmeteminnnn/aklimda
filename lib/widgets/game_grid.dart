@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/game_provider.dart';
 import 'memory_card.dart';
-import 'dart:math';
 
 class GameGrid extends StatelessWidget {
+  const GameGrid({super.key});
   @override
   Widget build(BuildContext context) {
     final gameProvider = context.watch<GameProvider>();

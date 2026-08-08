@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'dart:math';
 import '../models/player.dart';
 import '../models/card_item.dart';
 import '../widgets/game_over_dialog.dart';

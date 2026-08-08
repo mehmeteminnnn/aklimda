@@ -122,7 +122,7 @@ class AppTheme {
     ),
     pageTransitionsTheme: const PageTransitionsTheme(
       builders: {
-        TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+        TargetPlatform.iOS: FadeUpwardsPageTransitionsBuilder(),
         TargetPlatform.android: FadeUpwardsPageTransitionsBuilder(),
       },
     ),

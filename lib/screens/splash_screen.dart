@@ -88,7 +88,7 @@ class _SplashScreenState extends State<SplashScreen>
                                     color: Colors.white,
                                     shadows: [
                                       Shadow(
-                                        color: Colors.black.withOpacity(0.3),
+                                        color: Colors.black.withValues(alpha: 0.3),
                                         offset: const Offset(2, 2),
                                         blurRadius: 4,
                                       ),
@@ -101,7 +101,7 @@ class _SplashScreenState extends State<SplashScreen>
                                   style: TextStyle(
                                     fontSize: 18,
                                     fontFamily: 'Nunito',
-                                    color: Colors.white.withOpacity(0.9),
+                                    color: Colors.white.withValues(alpha: 0.9),
                                   ),
                                 ),
                               ],

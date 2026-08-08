@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:confetti/confetti.dart';
-import 'dart:math';
 import '../providers/game_provider.dart';
 import '../providers/language_provider.dart';
 import '../utils/theme.dart';
